@@ -1,8 +1,8 @@
 from homeassistant import config_entries
 import voluptuous as vol
-
 from .const import DOMAIN
 
+@config_entries.HANDLERS.register(DOMAIN)
 class MyCustomComponentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for My Custom Component."""
 
