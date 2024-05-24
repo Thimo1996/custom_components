@@ -39,6 +39,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 class MyCustomSensor(SensorEntity):
     def __init__(self, coordinator):
+        super().__init__()
         self.coordinator = coordinator
         self._attr_name = "Afvalstroom Ophaaldatum"
         self._attr_native_value = None
