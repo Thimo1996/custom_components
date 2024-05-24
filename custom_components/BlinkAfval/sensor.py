@@ -1,5 +1,4 @@
 import aiohttp
-import asyncio
 import logging
 from datetime import timedelta
 
@@ -12,13 +11,12 @@ from homeassistant.helpers.update_coordinator import (
 
 _LOGGER = logging.getLogger(__name__)
 
-URL = "https://www.mijnblink.nl/rest/adressen/1652200000015834/kalender/2024"
-
 async def async_setup_entry(hass, config_entry, async_add_entities):
+    url = config_entry.data["url"]
     session = async_get_clientsession(hass)
 
     async def async_fetch_data():
-        async with session.get(URL) as response:
+        async with session.get(url) as response:
             if response.status != 200:
                 raise UpdateFailed(f"Error fetching data: {response.status}")
             data = await response.json()
@@ -32,7 +30,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
         _LOGGER,
         name="my_custom_component",
         update_method=async_fetch_data,
-        update_interval=timedelta(hours=1),
+        update_interval=timedelta(minutes=15),
     )
 
     await coordinator.async_config_entry_first_refresh()

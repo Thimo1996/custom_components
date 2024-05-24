@@ -3,9 +3,9 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-_LOGGER = logging.getLogger(__name__)
+from const import DOMAIN
 
-DOMAIN = "my_custom_component"
+_LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     _LOGGER.info("Setting up My Custom Component")
