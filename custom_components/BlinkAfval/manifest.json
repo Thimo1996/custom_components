@@ -1,7 +1,7 @@
 {
     "domain": "my_custom_component",
     "name": "My Custom Component",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "documentation": "https://github.com/yourusername/my_custom_component",
     "dependencies": [],
     "codeowners": ["@yourusername"],

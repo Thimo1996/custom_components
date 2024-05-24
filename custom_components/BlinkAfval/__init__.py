@@ -3,7 +3,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from const import DOMAIN
+from custom_components.BlinkAfval.const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
