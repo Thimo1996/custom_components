@@ -57,8 +57,10 @@ class MyCustomComponentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
-                    data = response.json()
-                    return data[0].get("bagid")
+                    data = await response.json()
+                    if data:
+                        data = response.json()
+                        return data[0].get("bagid")
                 else:
                     return False
     
