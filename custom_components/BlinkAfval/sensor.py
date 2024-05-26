@@ -48,7 +48,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     await coordinator.async_config_entry_first_refresh()
 
     sensors = []
-    id = config_entry.data["url"]
+    id = config_entry.data["blinkID"]
     url = f"https://www.mijnblink.nl/rest/adressen/{id}/afvalstromen"
     #add sensor for each waste stream
     try:
