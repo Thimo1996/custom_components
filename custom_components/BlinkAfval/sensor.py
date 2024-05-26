@@ -28,11 +28,11 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 for item in data:
                     afvalstroom_id = item.get("afvalstroom_id")
                     ophaaldatum_str = item.get("ophaaldatum")
-                    if afvalstroom_id in [4, 5, 6]:
+                    if afvalstroom_id in [4, 77, 81]:
                         ophaaldatum = datetime.strptime(ophaaldatum_str, "%Y-%m-%d").date()
                         if ophaaldatum >= current_date:
                             if afvalstroom_id not in results or ophaaldatum < results[afvalstroom_id]["ophaaldatum"]:
-                                results[afvalstroom_id] = {"ophaaldatum": ophaaldatum, "item": item}
+                                results[afvalstroom_id] = item
                 
                 closest_results = {k: v["item"] for k, v in results.items()}
                 _LOGGER.debug(f"Closest results: {closest_results}")
@@ -54,7 +54,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     sensors = [
         MyCustomSensor(coordinator, 4, "groen"),
         MyCustomSensor(coordinator, 77, "GFT/groenbak"),
-        MyCustomSensor(coordinator, 6, "Restafval"),
+        MyCustomSensor(coordinator, 81, "Restafval"),
     ]
     async_add_entities(sensors, True)
     _LOGGER.debug("Entities added")
@@ -67,11 +67,15 @@ class MyCustomSensor(SensorEntity):
         self.afvalstroom_id = afvalstroom_id
         self._attr_name = name
         self._attr_native_value = None
+        self._attr_device_class = 'date'  
 
     @property
     def native_value(self):
         _LOGGER.debug(f"Getting native_value for ID {self.afvalstroom_id}: {self.coordinator.data}")
-        return self.coordinator.data.get(self.afvalstroom_id) if self.coordinator.data else None
+        date_str = self.coordinator.data.get(self.afvalstroom_id, {}).get("ophaaldatum") if self.coordinator.data else None
+        if date_str:
+            return datetime.strptime(date_str, "%Y-%m-%d").date()
+        return None
 
     @property
     def available(self):
