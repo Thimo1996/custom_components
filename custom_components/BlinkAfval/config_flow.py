@@ -59,7 +59,6 @@ class MyCustomComponentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 if response.status == 200:
                     data = await response.json()
                     if data:
-                        data = response.json()
                         return data[0].get("bagid")
                 else:
                     return False
