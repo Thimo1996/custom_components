@@ -27,7 +27,7 @@ class MyCustomComponentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "Invalid address. Please check your zip code and address number."
             else:
                 # Address is valid, proceed to the next step
-                return await self.async_step_url()
+                return await self.async_step_url(rs)
                 
         
         # Define the schema for this step with translation keys
