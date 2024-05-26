@@ -33,9 +33,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                         if ophaaldatum >= current_date:
                             if afvalstroom_id not in results or ophaaldatum < datetime.strptime(results[afvalstroom_id]["ophaaldatum"], "%Y-%m-%d").date():
                                 results[afvalstroom_id] = item
-                closest_results = {k: v["item"] for k, v in results.items()}
-                _LOGGER.debug(f"Closest results: {closest_results}")
-                return closest_results
+                return results
         except Exception as e:
             _LOGGER.error(f"Exception while fetching data: {e}")
             raise UpdateFailed(f"Error fetching data: {e}")
