@@ -58,9 +58,7 @@ class MyCustomComponentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             async with session.get(url) as response:
                 if response.status == 200:
                     data = response.json()
-                    for item in data:
-                        id = item.get("bagid")
-                    return id
+                    return data[0].get("bagid")
                 else:
                     return False
     
