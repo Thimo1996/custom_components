@@ -1,1 +1,1 @@
-DOMAIN = "my_custom_component"
+DOMAIN = "BlinkAfval"

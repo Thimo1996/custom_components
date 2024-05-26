@@ -28,11 +28,10 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 for item in data:
                     afvalstroom_id = item.get("afvalstroom_id")
                     ophaaldatum_str = item.get("ophaaldatum")
-                    if afvalstroom_id in [4, 77, 81]:
-                        ophaaldatum = datetime.strptime(ophaaldatum_str, "%Y-%m-%d").date()
-                        if ophaaldatum >= current_date:
-                            if afvalstroom_id not in results or ophaaldatum < datetime.strptime(results[afvalstroom_id]["ophaaldatum"], "%Y-%m-%d").date():
-                                results[afvalstroom_id] = item
+                    ophaaldatum = datetime.strptime(ophaaldatum_str, "%Y-%m-%d").date()
+                    if ophaaldatum >= current_date:
+                        if afvalstroom_id not in results or ophaaldatum < datetime.strptime(results[afvalstroom_id]["ophaaldatum"], "%Y-%m-%d").date():
+                            results[afvalstroom_id] = item
                 return results
         except Exception as e:
             _LOGGER.error(f"Exception while fetching data: {e}")
@@ -48,11 +47,23 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     await coordinator.async_config_entry_first_refresh()
 
-    sensors = [
-        MyCustomSensor(coordinator, 4, "groen"),
-        MyCustomSensor(coordinator, 77, "GFT/groenbak"),
-        MyCustomSensor(coordinator, 81, "Restafval"),
-    ]
+    sensors = []
+    id = config_entry.data["url"]
+    url = f"https://www.mijnblink.nl/rest/adressen/{id}/afvalstromen"
+    #add sensor for each waste stream
+    try:
+        async with session.get(url) as response:
+            if response.status != 200:
+                raise UpdateFailed(f"Error fetching data: {response.status}")
+            data = await response.json()
+            for item in data:
+                if item.get('parent_id') == 0:
+                    MyCustomSensor(coordinator, item.get(id), item.get('page_title'))
+    except Exception as e:
+        _LOGGER.error(f"Exception while fetching data: {e}")
+        raise UpdateFailed(f"Error fetching data: {e}")
+    
+
     async_add_entities(sensors, True)
     _LOGGER.debug("Entities added")
 

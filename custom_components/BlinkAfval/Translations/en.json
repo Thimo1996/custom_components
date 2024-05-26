@@ -1,0 +1,12 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "data": {
+                    "zip_code": "zip code",
+                    "address_number": "address number"
+                }
+            }
+        }
+    }
+}
