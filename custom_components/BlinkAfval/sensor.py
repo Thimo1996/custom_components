@@ -31,9 +31,8 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                     if afvalstroom_id in [4, 77, 81]:
                         ophaaldatum = datetime.strptime(ophaaldatum_str, "%Y-%m-%d").date()
                         if ophaaldatum >= current_date:
-                            if afvalstroom_id not in results or ophaaldatum < results[afvalstroom_id]["ophaaldatum"]:
+                            if afvalstroom_id not in results or ophaaldatum < datetime.strptime(results[afvalstroom_id]["ophaaldatum"], "%Y-%m-%d").date():
                                 results[afvalstroom_id] = item
-                
                 closest_results = {k: v["item"] for k, v in results.items()}
                 _LOGGER.debug(f"Closest results: {closest_results}")
                 return closest_results
