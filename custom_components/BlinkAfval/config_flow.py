@@ -1,3 +1,4 @@
+import aiohttp
 from homeassistant import config_entries
 import voluptuous as vol
 import requests
@@ -53,14 +54,13 @@ class MyCustomComponentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Replace the URL with your actual JSON API endpoint
         zipcode = zip_code.replace(" ","")
         url = f"https://www.mijnblink.nl/adressen/{zip_code}:{address_number}"
-        response = requests.get(url)
-        
-        # Check if the address is valid based on the API response
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("valid"):
-                for item in data:
-                    id = item.get("bagid")
-                return id
-        
-        return False
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = response.json()
+                    for item in data:
+                        id = item.get("bagid")
+                    return id
+                else:
+                    return False
+    
