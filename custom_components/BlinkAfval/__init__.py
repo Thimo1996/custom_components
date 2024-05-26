@@ -4,6 +4,7 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
+DOMAIN = "hello_state"
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     _LOGGER.info("Setting up My Custom Component")

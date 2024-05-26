@@ -1,6 +1,6 @@
 import aiohttp
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import (
@@ -22,12 +22,21 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                     raise UpdateFailed(f"Error fetching data: {response.status}")
                 data = await response.json()
                 _LOGGER.debug(f"Fetched data: {data}")
+
+                results = {}
+                current_date = datetime.now().date()
                 for item in data:
-                    if item.get("afvalstroom_id") == 4:
-                        _LOGGER.debug(f"Found matching item: {item}")
-                        return item.get("ophaaldatum")
-                _LOGGER.debug("No matching item found")
-                return None
+                    afvalstroom_id = item.get("afvalstroom_id")
+                    ophaaldatum_str = item.get("ophaaldatum")
+                    if afvalstroom_id in [4, 5, 6]:
+                        ophaaldatum = datetime.strptime(ophaaldatum_str, "%Y-%m-%d").date()
+                        if ophaaldatum >= current_date:
+                            if afvalstroom_id not in results or ophaaldatum < results[afvalstroom_id]["ophaaldatum"]:
+                                results[afvalstroom_id] = {"ophaaldatum": ophaaldatum, "item": item}
+                
+                closest_results = {k: v["item"] for k, v in results.items()}
+                _LOGGER.debug(f"Closest results: {closest_results}")
+                return closest_results
         except Exception as e:
             _LOGGER.error(f"Exception while fetching data: {e}")
             raise UpdateFailed(f"Error fetching data: {e}")
@@ -42,26 +51,33 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
     await coordinator.async_config_entry_first_refresh()
 
-    async_add_entities([MyCustomSensor(coordinator)], True)
+    sensors = [
+        MyCustomSensor(coordinator, 4, "groen"),
+        MyCustomSensor(coordinator, 77, "GFT/groenbak"),
+        MyCustomSensor(coordinator, 6, "Restafval"),
+    ]
+    async_add_entities(sensors, True)
     _LOGGER.debug("Entities added")
 
+
 class MyCustomSensor(SensorEntity):
-    def __init__(self, coordinator):
+    def __init__(self, coordinator, afvalstroom_id, name):
         super().__init__()
         self.coordinator = coordinator
-        self._attr_name = "Afvalstroom Ophaaldatum"
+        self.afvalstroom_id = afvalstroom_id
+        self._attr_name = name
         self._attr_native_value = None
 
     @property
     def native_value(self):
-        _LOGGER.debug(f"Getting native_value: {self.coordinator.data}")
-        return self.coordinator.data
+        _LOGGER.debug(f"Getting native_value for ID {self.afvalstroom_id}: {self.coordinator.data}")
+        return self.coordinator.data.get(self.afvalstroom_id) if self.coordinator.data else None
 
     @property
     def available(self):
-        _LOGGER.debug(f"Checking availability: {self.coordinator.last_update_success}")
+        _LOGGER.debug(f"Checking availability for ID {self.afvalstroom_id}: {self.coordinator.last_update_success}")
         return self.coordinator.last_update_success
 
     async def async_update(self):
-        _LOGGER.debug("Requesting refresh")
+        _LOGGER.debug(f"Requesting refresh for ID {self.afvalstroom_id}")
         await self.coordinator.async_request_refresh()
