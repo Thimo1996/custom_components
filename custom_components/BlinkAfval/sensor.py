@@ -11,7 +11,8 @@ from homeassistant.helpers.update_coordinator import (
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    url = config_entry.data["url"]
+    BlinkId = config_entry.data["blinkID"]
+    url = f"https://www.mijnblink.nl/rest/adressen/{BlinkId}/afvalstromen"
     session = async_get_clientsession(hass)
     _LOGGER.debug(f"Setting up entry with URL: {url}")
 
@@ -24,14 +25,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
                 _LOGGER.debug(f"Fetched data: {data}")
 
                 results = {}
-                current_date = datetime.now().date()
                 for item in data:
-                    afvalstroom_id = item.get("afvalstroom_id")
-                    ophaaldatum_str = item.get("ophaaldatum")
-                    ophaaldatum = datetime.strptime(ophaaldatum_str, "%Y-%m-%d").date()
-                    if ophaaldatum >= current_date:
-                        if afvalstroom_id not in results or ophaaldatum < datetime.strptime(results[afvalstroom_id]["ophaaldatum"], "%Y-%m-%d").date():
-                            results[afvalstroom_id] = item
+                    afvalstroom_id = item.get("id")
+                    results[afvalstroom_id] = item
                 return results
         except Exception as e:
             _LOGGER.error(f"Exception while fetching data: {e}")
