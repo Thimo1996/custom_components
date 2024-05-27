@@ -72,8 +72,7 @@ class MyCustomSensor(SensorEntity):
         self.afvalstroom_id = afvalstroom_id
         self._attr_name = name
         self._attr_native_value = None
-        self._attr_device_class = 'date'  
-        self.entity_id = afvalstroom_id
+        self._attr_device_class = 'date'
 
     @property
     def native_value(self):
