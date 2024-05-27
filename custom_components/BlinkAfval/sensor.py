@@ -1,7 +1,7 @@
 import aiohttp
 import logging
 from datetime import timedelta, datetime
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.datetime import DateTimeEntity
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
@@ -65,7 +65,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     _LOGGER.debug("Entities added")
 
 
-class MyCustomSensor(SensorEntity):
+class MyCustomSensor(DateTimeEntity):
     def __init__(self, coordinator, afvalstroom_id, name):
         super().__init__()
         self.coordinator = coordinator
