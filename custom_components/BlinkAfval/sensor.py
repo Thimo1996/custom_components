@@ -54,8 +54,9 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             data = await response.json()
             for item in data:
                 if item.get('parent_id') == 0:
+                    enable = item.get('ophaaldatum') is not None
                     _LOGGER.debug(f"add id: {item.get('id')}")            
-                    sensors.append(MyCustomSensor(coordinator, item.get('id'), item.get('page_title')))
+                    sensors.append(MyCustomSensor(coordinator, item.get('id'), item.get('page_title')),enable)
     except Exception as e:
         _LOGGER.error(f"Exception while fetching data: {e}")
         raise UpdateFailed(f"Error fetching data: {e}")
@@ -66,13 +67,15 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
 
 
 class MyCustomSensor(SensorEntity):
-    def __init__(self, coordinator, afvalstroom_id, name):
+    def __init__(self, coordinator, afvalstroom_id, name, enable):
         super().__init__()
         self.coordinator = coordinator
         self.afvalstroom_id = afvalstroom_id
         self._attr_name = name
         self._attr_native_value = None
         self._attr_device_class = 'date'  
+        self.enabled = enable
+        self.entity_id = afvalstroom_id
 
     @property
     def native_value(self):
