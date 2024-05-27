@@ -58,7 +58,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
             data = await response.json()
             for item in data:
                 if item.get('parent_id') == 0:
-                    sensors.append(MyCustomSensor(coordinator, item.get(id), item.get('page_title')))
+                    sensors.append(MyCustomSensor(coordinator, item.get('id'), item.get('page_title')))
     except Exception as e:
         _LOGGER.error(f"Exception while fetching data: {e}")
         raise UpdateFailed(f"Error fetching data: {e}")
